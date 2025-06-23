@@ -2,17 +2,26 @@ import http from 'node:http'
 import { getDataFromDB } from './database/db.js'
 import { sendJSONResponse } from './utils/sendJSONResponse.js'
 import { getDataByPathParams } from './utils/getDataByPathParams.js'
+import { getDataByQuery } from "./utils/getDataByQuery.js"
 
 const PORT = 8000
 
 const server = http.createServer(async (req, res) => {
   const destinations = await getDataFromDB()
 
-  if (req.url === '/api' && req.method === 'GET') {
+  const urlObj = new URL(req.url, `http://${req.headers.host}`)
+  const queryObj = Object.fromEntries(urlObj.searchParams)
 
-    sendJSONResponse(res, 200, destinations)
+    // console.log(urlObj.pathname)
+    // console.log(urlObj.pathname === "/api")
 
-  } else if (req.url.startsWith('/api/continent') && req.method === 'GET') {
+  if (urlObj.pathname === '/api' && req.method === 'GET') {
+
+    const filteredData = getDataByQuery(destinations, queryObj)
+
+    sendJSONResponse(res, 200, filteredData)
+
+  } else if (urlObj.pathname === "/api/continent" && req.method === 'GET') {
 
     const continent = req.url.split('/').pop()
     const filteredData = getDataByPathParams(destinations, 'continent', continent)
