@@ -18,7 +18,7 @@ const server = http.createServer(async (req, res) => {
 
     sendJSONResponse(res, 200, filteredData)
 
-  } else if (urlObj.pathname === "/api/continent" && req.method === 'GET') {
+  } else if (req.url.startsWith('/api/continent') && req.method === 'GET') {
 
     const continent = req.url.split('/').pop()
     const filteredData = getDataByPathParams(destinations, 'continent', continent)
@@ -29,10 +29,7 @@ const server = http.createServer(async (req, res) => {
     const country = req.url.split('/').pop()
     const filteredData = getDataByPathParams(destinations, 'country', country)
     sendJSONResponse(res, 200, filteredData)
-
-  } 
-  
-  else {
+  } else {
 
     res.setHeader('Content-Type', 'application/json')
     sendJSONResponse(res, 404, ({
